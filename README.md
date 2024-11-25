@@ -54,6 +54,7 @@ The news collection process involved:
 1. **Data Collection**:
 ```python
 a_news_scrapper.py
+ifix_processor_bulk.py
 ```
 
 2. **Data Processing**:
