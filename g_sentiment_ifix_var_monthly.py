@@ -4,15 +4,17 @@ from statsmodels.tsa.stattools import adfuller
 from statsmodels.tsa.api import VAR
 
 #%%
-############ Preparing the data for the VAR Model + Plots ############
-############ Using data subset considering only 1 year ############
+############ VAR Model + Plots for MONTHLY data ############
 # Import the CSV as a dataframe
 df = pd.read_csv('csv_output/d_ifix_sentiment.csv', parse_dates=["date"])
 
-# Filter the dataframe based on the date range
-start_date = '2023-08-21'
-end_date = '2024-08-21'
-df = df[(df['date'] >= start_date) & (df['date'] <= end_date)]
+# Group by the year and month, then calculate the average for numeric columns
+df = (
+    df.groupby(df['date'].dt.to_period('M'))
+      .mean(numeric_only=True)
+      .reset_index()
+)
+df['date'] = df['date'].dt.to_timestamp()
 
 #%%
 # Create a single plot for IFIX value
@@ -67,8 +69,6 @@ def check_stationarity(series, cutoff=0.05):
 # Check for stationarity
 ifix_stationary = check_stationarity(df['ifix_value'])
 sentiment_stationary = check_stationarity(df['average_sentiment'])
-title_stationary = check_stationarity(df['title_sentiment'])
-snippet_stationary = check_stationarity(df['snippet_sentiment'])
 
 #%%
 # Difference if not stationary
@@ -121,7 +121,7 @@ plt.tight_layout()
 plt.show()
 
 #%%
-############ MODEL 2 - IFIX x Average Sentiment (dataset limited to 1 year) ############
+############ MODEL 3 - IFIX x Average Sentiment (monthly average) ############
 
 # Select only the necessary columns for the VAR model
 df_var = df[['ifix_value', 'average_sentiment']]
@@ -136,7 +136,7 @@ model = VAR(df_var)
 #%%
 # Fit the model and select the optimal lag based on BIC
 # The maxlags parameter is the maximum number of lags to check
-lag_order = model.select_order(maxlags=30)
+lag_order = model.select_order(maxlags=6)
 print(lag_order.summary())  # This will show BIC and other criteria for different lag orders
 
 #%%
