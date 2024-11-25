@@ -72,4 +72,5 @@ c_news_sentiment_analyzing.py
 d_sentiment_ifix_preparation.py
 e_sentiment_ifix_stationarity_var.py
 f_sentiment_ifix_var_subset.py
+g_sentiment_ifix_var_monthly.py
 ```
